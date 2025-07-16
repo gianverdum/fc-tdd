@@ -1,5 +1,5 @@
 import { DateRange } from "./date_range";
-describe('DateRange Value Object', () => {
+describe('DateRange Value Object unit tests', () => {
     it('should throw an error if end date is before start date', () => {
         expect(() => {
             new DateRange(new Date('2024-12-25'), new Date('2024-12-20'))
