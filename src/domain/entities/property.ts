@@ -12,6 +12,7 @@ export class Property {
         this.description = description,
         this.maxGuests = maxGuests,
         this.basePricePerNight = basePricePerNight
+        this.validate();
     }
 
     getId(): string {
@@ -32,5 +33,26 @@ export class Property {
 
     getBasePricePerNight(): number {
         return this.basePricePerNight;
+    }
+
+    validateGuestCount(guestCount: number): void {
+        if (guestCount > this.maxGuests) {
+            throw new Error(`Number of guests exceeded. Maximum allowed: ${this.maxGuests}`)
+        }
+    }
+
+    private validate(): void {
+        if (!this.id) {
+            throw new Error(`The property's id is required`);
+        }
+        if (!this.name) {
+            throw new Error(`The property's name is required`);
+        }
+        if (!this.description) {
+            throw new Error(`The property's description is required`);
+        }
+        if (this.maxGuests <= 0) {
+            throw new Error('The maximum number of guests must be greater than zero');
+        }
     }
 }
