@@ -1,4 +1,5 @@
 import { Property } from './property';
+import { DateRange } from "../value_objects/date_range";
 
 describe('Property entity unit tests', () => {
     it('should create a property entity with all the attributes', () => {
@@ -42,5 +43,23 @@ describe('Property entity unit tests', () => {
         expect(() => {
             property.validateGuestCount(6);
         }).toThrow(`Number of guests exceeded. Maximum allowed: ${property.getMaxGuests()}`);
+    });
+    it('should not apply discount if booking is less than seven nights', () => {
+        const property = new Property('1', 'Apartment', 'Description', 2, 100);
+        const dateRange = new DateRange(
+            new Date('2024-12-10'),
+            new Date('2024-12-16')
+        );
+        const totalPrice = property.calculateTotalPrice(dateRange);
+        expect(totalPrice).toBe(600);
+    });
+    it('should apply discount if booking is greater than or equal to seven nights', () => {
+        const property = new Property('1', 'Apartment', 'Description', 2, 100);
+        const dateRange = new DateRange(
+            new Date('2024-12-10'),
+            new Date('2024-12-17')
+        );
+        const totalPrice = property.calculateTotalPrice(dateRange);
+        expect(totalPrice).toBe(630);
     });
 });
