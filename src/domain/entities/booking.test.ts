@@ -44,4 +44,17 @@ describe('Booking entity unit tests', () => {
             new Booking('1', property, user, dateRange, 6);
         }).toThrow(`Number of guests exceeded. Maximum allowed: ${property.getMaxGuests()}`);
     });
+    it('should calculate the total price with discount', () => {
+        // Arrange
+        const property = new Property('1', 'Home', 'Description', 5, 300);
+        const user = new User('1', 'Jhon Doe');
+        const dateRange = new DateRange(
+            new Date('2024-12-01'),
+            new Date('2024-12-10')
+        );
+        // Act
+        const booking = new Booking('1', property, user, dateRange, 4);
+        // Assert
+        expect(booking.getTotalPrice()).toBe(300*9*0.9);
+    });
 });

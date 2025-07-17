@@ -9,6 +9,7 @@ export class Booking {
     private readonly dateRange: DateRange;
     private readonly guestCount: number;
     private readonly status: 'CONFIRMED' | 'CANCELLED' = 'CONFIRMED';
+    private totalPrice: number;
 
     constructor(
         id: string,
@@ -22,7 +23,9 @@ export class Booking {
         this.guest = guest;
         this.dateRange = dateRange;
         this.guestCount = guestCount;
+        this.totalPrice = property.calculateTotalPrice(dateRange);
         this.validate();
+
         property.addBooking(this);
     }
 
@@ -48,6 +51,10 @@ export class Booking {
 
     getStatus(): 'CONFIRMED' | 'CANCELLED' {
         return this.status;
+    }
+
+    getTotalPrice(): number {
+        return this.totalPrice;
     }
 
     validate(): void {
