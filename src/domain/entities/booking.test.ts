@@ -20,4 +20,28 @@ describe('Booking entity unit tests', () => {
         expect(booking.getDateRange()).toBe(dateRange);
         expect(booking.getGuestCount()).toBe(2);
     });
+    it('should throw an error if number of guests is equal or less than zero', () => {
+        const property = new Property('1', 'Home', 'Description', 5, 150);
+        const user = new User('1', 'Jhon Doe');
+        const dateRange = new DateRange(
+            new Date('2024-12-10'),
+            new Date('2024-12-15')
+        );
+
+        expect(() => {
+            new Booking('1', property, user, dateRange, 0);
+        }).toThrow('The number of guests must be greater than zero');
+    });
+    it('should throw an error when booking if guest count exceeds the maximum allowed', () => {
+        const property = new Property('1', 'Home', 'Description', 5, 150);
+        const user = new User('1', 'Jhon Doe');
+        const dateRange = new DateRange(
+            new Date('2024-12-10'),
+            new Date('2024-12-15')
+        );
+
+        expect(() => {
+            new Booking('1', property, user, dateRange, 6);
+        }).toThrow(`Number of guests exceeded. Maximum allowed: ${property.getMaxGuests()}`);
+    });
 });

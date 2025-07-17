@@ -22,7 +22,7 @@ export class Booking {
         this.guest = guest;
         this.dateRange = dateRange;
         this.guestCount = guestCount;
-
+        this.validate();
         property.addBooking(this);
     }
 
@@ -48,5 +48,12 @@ export class Booking {
 
     getStatus(): 'CONFIRMED' | 'CANCELLED' {
         return this.status;
+    }
+
+    validate(): void {
+        if (this.guestCount <= 0) {
+            throw new Error('The number of guests must be greater than zero');
+        }
+        this.property.validateGuestCount(this.guestCount);
     }
 }
