@@ -24,6 +24,7 @@ export class Booking {
         this.dateRange = dateRange;
         this.guestCount = guestCount;
         this.totalPrice = property.calculateTotalPrice(dateRange);
+        this.status = 'CONFIRMED';
         this.validate();
 
         property.addBooking(this);
@@ -62,5 +63,8 @@ export class Booking {
             throw new Error('The number of guests must be greater than zero');
         }
         this.property.validateGuestCount(this.guestCount);
+        if (!this.property.isAvailable(this.dateRange)) {
+            throw new Error('The property is unavailable in the date range requested');
+        }
     }
 }

@@ -57,4 +57,22 @@ describe('Booking entity unit tests', () => {
         // Assert
         expect(booking.getTotalPrice()).toBe(300*9*0.9);
     });
+    it('should not book when a property is unavailable', () => {
+        // Arrange
+        const property = new Property('1', 'Home', 'Description', 5, 300);
+        const user = new User('1', 'Jhon Doe');
+        const dateRange = new DateRange(
+            new Date('2024-12-01'),
+            new Date('2024-12-10')
+        );
+        const booking = new Booking('1', property, user, dateRange, 4);
+        const dateRange2 = new DateRange(
+            new Date('2024-12-02'),
+            new Date('2024-12-09')
+        );
+        // Act & Assert
+        expect(() => {
+            new Booking('1', property, user, dateRange2, 4);
+        }).toThrow('The property is unavailable in the date range requested');
+    });
 });
