@@ -1,5 +1,7 @@
 import { Property } from './property';
 import { DateRange } from "../value_objects/date_range";
+import { User } from './user';
+import { Booking } from './booking';
 
 describe('Property entity unit tests', () => {
     it('should create a property entity with all the attributes', () => {
@@ -62,4 +64,21 @@ describe('Property entity unit tests', () => {
         const totalPrice = property.calculateTotalPrice(dateRange);
         expect(totalPrice).toBe(630);
     });
+    it(`should validate property's availability for given dates`, () => {
+        const property = new Property('1', 'Apartment', 'Description', 4, 100);
+        const user = new User('1', 'Jhon Doe');
+        const dateRange = new DateRange(
+            new Date('2024-12-20'),
+            new Date('2024-12-25')
+        );
+        const dateRange2 = new DateRange(
+            new Date('2024-12-22'),
+            new Date('2024-12-27')
+        );
+
+        new Booking('1', property, user, dateRange, 2);
+
+        expect(property.isAvailable(dateRange)).toBe(false);
+        expect(property.isAvailable(dateRange2)).toBe(false);
+    })
 });
