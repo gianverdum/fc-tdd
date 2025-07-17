@@ -8,7 +8,7 @@ export class Booking {
     private readonly guest: User;
     private readonly dateRange: DateRange;
     private readonly guestCount: number;
-    private readonly status: 'CONFIRMED' | 'CANCELLED' = 'CONFIRMED';
+    private status: 'CONFIRMED' | 'CANCELLED' = 'CONFIRMED';
     private totalPrice: number;
 
     constructor(
@@ -58,7 +58,24 @@ export class Booking {
         return this.totalPrice;
     }
 
-    validate(): void {
+    cancel(currentDate: Date): void {
+        if (this.status === 'CANCELLED') {
+            throw new Error('This booking is already cancelled');
+        }
+        this.status = 'CANCELLED';
+
+        const checkInDate = this.dateRange.getStartDate();
+        const timeDiff = checkInDate.getTime() - currentDate.getTime();
+        const daysUntilCheckIn = Math.ceil(timeDiff / (1000 * 3600 * 24));
+
+        if (daysUntilCheckIn > 7) {
+            this.totalPrice = 0;
+        } else if (daysUntilCheckIn >= 1) {
+            this.totalPrice *= 0.5;
+        }
+    }
+
+    private validate(): void {
         if (this.guestCount <= 0) {
             throw new Error('The number of guests must be greater than zero');
         }

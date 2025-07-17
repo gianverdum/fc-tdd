@@ -66,10 +66,6 @@ export class Property {
         this.bookings.push(booking);
     }
 
-    getBookings(): Booking[] {
-        return [...this.bookings];
-    }
-
     private validate(): void {
         if (!this.id) {
             throw new Error(`The property's id is required`);

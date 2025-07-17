@@ -75,4 +75,68 @@ describe('Booking entity unit tests', () => {
             new Booking('1', property, user, dateRange2, 4);
         }).toThrow('The property is unavailable in the date range requested');
     });
+    it('should cancel a booking without reimbursement when there is less than one day left before check-in', () => {
+        // Arrange
+        const property = new Property('1', 'Home', 'Description', 5, 300);
+        const user = new User('1', 'Jhon Doe');
+        const dateRange = new DateRange(
+            new Date('2024-12-20'),
+            new Date('2024-12-22')
+        );
+        const booking = new Booking('1', property, user, dateRange, 4);
+
+        const currentDate = new Date('2024-12-20');
+        booking.cancel(currentDate);
+
+        expect(booking.getStatus()).toBe('CANCELLED');
+        expect(booking.getTotalPrice()).toBe(600);
+    });
+    it('should cancel a booking with full reimbursement when there is more than seven days before check-in', () => {
+        // Arrange
+        const property = new Property('1', 'Home', 'Description', 5, 300);
+        const user = new User('1', 'Jhon Doe');
+        const dateRange = new DateRange(
+            new Date('2024-12-20'),
+            new Date('2024-12-25')
+        );
+        const booking = new Booking('1', property, user, dateRange, 4);
+
+        const currentDate = new Date('2024-12-10');
+        booking.cancel(currentDate);
+
+        expect(booking.getStatus()).toBe('CANCELLED');
+        expect(booking.getTotalPrice()).toBe(0);
+    });
+    it('should cancel a booking with partial reimbursement when there is between one to seven days before check-in', () => {
+        // Arrange
+        const property = new Property('1', 'Home', 'Description', 5, 300);
+        const user = new User('1', 'Jhon Doe');
+        const dateRange = new DateRange(
+            new Date('2024-12-20'),
+            new Date('2024-12-25')
+        );
+        const booking = new Booking('1', property, user, dateRange, 4);
+
+        const currentDate = new Date('2024-12-13');
+        booking.cancel(currentDate);
+
+        expect(booking.getStatus()).toBe('CANCELLED');
+        expect(booking.getTotalPrice()).toBe(300 * 5 * 0.5);
+    });
+    it('should not cancel the same booking more than once', () => {
+        // Arrange
+        const property = new Property('1', 'Home', 'Description', 5, 300);
+        const user = new User('1', 'Jhon Doe');
+        const dateRange = new DateRange(
+            new Date('2024-12-20'),
+            new Date('2024-12-25')
+        );
+        const booking = new Booking('1', property, user, dateRange, 4);
+
+        const currentDate = new Date('2024-12-13');
+        booking.cancel(currentDate);
+        expect(() => {
+            booking.cancel(currentDate);
+        }).toThrow('This booking is already cancelled');
+    });
 });
