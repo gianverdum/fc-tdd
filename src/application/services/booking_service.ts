@@ -20,7 +20,7 @@ export class BookingService {
         }
         const guest = await this.userService.findUserById(dto.guestId);
         if (!guest) {
-            throw new Error('Guest not found');
+            throw new Error('User not found');
         }
         const dateRange = this.dateRangeFactory.create(dto.startDate, dto.endDate);
 

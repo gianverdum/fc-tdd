@@ -76,4 +76,35 @@ describe('BookingService', () => {
         expect(savedBooking).not.toBeNull();
         expect(savedBooking?.getId()).toBe(result.getId());
     });
+    it('should throw an error when the property is not found', async () => {
+        mockPropertyService.findPropertyById.mockResolvedValue(null);
+
+        const bookingDTO: CreateBookingDTO = {
+            propertyId: '1',
+            guestId: '1',
+            startDate: new Date('2024-12-20'),
+            endDate: new Date('2024-12-25'),
+            guestCount: 2,
+        };
+
+        await expect(bookingService.createBooking(bookingDTO)).rejects.toThrow('Property not found');
+    });
+    it('should throw an error when the user is not found', async () => {
+        const mockProperty = {
+            getid: jest.fn().mockReturnValue('1'),
+        } as any;
+
+        mockPropertyService.findPropertyById.mockResolvedValue(mockProperty);
+        mockUserService.findUserById.mockResolvedValue(null);
+
+        const bookingDTO: CreateBookingDTO = {
+            propertyId: '1',
+            guestId: '1',
+            startDate: new Date('2024-12-20'),
+            endDate: new Date('2024-12-25'),
+            guestCount: 2,
+        };
+
+        await expect(bookingService.createBooking(bookingDTO)).rejects.toThrow('User not found');
+    });
 });
