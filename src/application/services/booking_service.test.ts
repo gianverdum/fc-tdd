@@ -4,6 +4,7 @@ import { PropertyService } from "../../application/services/property_service";
 import { UserService } from "../../application/services/user_service";
 import { CreateBookingDTO } from "../dtos/create_booking_dto";
 import { FakeBookingRepository } from "../../infrastructure/repositories/fake_booking_repository";
+import { DateRangeFactory } from "../factories/date_range_factory";
 
 jest.mock('./property_service');
 jest.mock('./user_service');
@@ -13,6 +14,7 @@ describe('BookingService', () => {
     let fakeBookingRepository: FakeBookingRepository;
     let mockPropertyService: jest.Mocked<PropertyService>
     let mockUserService: jest.Mocked<UserService>
+    let mockDateRangeFactory: jest.Mocked<DateRangeFactory>
 
     beforeEach(() => {
         const mockPropertyRepository = {} as any;
@@ -26,16 +28,36 @@ describe('BookingService', () => {
             mockUserRepository
         ) as jest.Mocked<UserService>;
 
+        fakeBookingRepository = new FakeBookingRepository();
+
+        mockDateRangeFactory = {
+            create: jest.fn().mockReturnValue({} as any),
+        } as jest.Mocked<DateRangeFactory>;
+
         bookingService = new BookingService(
             fakeBookingRepository,
             mockPropertyService,
-            mockUserService
+            mockUserService,
+            mockDateRangeFactory
         );
-
-        fakeBookingRepository = new FakeBookingRepository();
     });
 
-    it('should create a booking using fake repository', () => {
+    it('should create a booking using fake repository', async () => {
+        const mockProperty = {
+            getId: jest.fn().mockReturnValue('1'),
+            isAvailable: jest.fn().mockReturnValue(true),
+            validateGuestCount: jest.fn(),
+            calculateTotalPrice: jest.fn().mockReturnValue(500),
+            addBooking: jest.fn(),
+        } as any;
+
+        const mockUser = {
+            getId: jest.fn().mockReturnValue('1'),
+        } as any;
+
+        mockPropertyService.findPropertyById.mockResolvedValue(mockProperty);
+        mockUserService.findUserById.mockResolvedValue(mockUser);
+
         const bookingDTO: CreateBookingDTO = {
             propertyId: '1',
             guestId: '1',
