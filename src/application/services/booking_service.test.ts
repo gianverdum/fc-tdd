@@ -19,6 +19,8 @@ describe('BookingService', () => {
     beforeEach(() => {
         const mockPropertyRepository = {} as any;
         const mockUserRepository = {} as any;
+        const startDate = new Date('2024-12-20');
+        const endDate = new Date('2024-12-25');
 
         mockPropertyService = new PropertyService(
             mockPropertyRepository
@@ -31,7 +33,10 @@ describe('BookingService', () => {
         fakeBookingRepository = new FakeBookingRepository();
 
         mockDateRangeFactory = {
-            create: jest.fn().mockReturnValue({} as any),
+            create: jest.fn().mockReturnValue({
+                getStartDate: jest.fn().mockReturnValue(startDate),
+                getEndDate: jest.fn().mockReturnValue(endDate),
+            }),
         } as jest.Mocked<DateRangeFactory>;
 
         bookingService = new BookingService(
@@ -91,7 +96,7 @@ describe('BookingService', () => {
     });
     it('should throw an error when the user is not found', async () => {
         const mockProperty = {
-            getid: jest.fn().mockReturnValue('1'),
+            getId: jest.fn().mockReturnValue('1'),
         } as any;
 
         mockPropertyService.findPropertyById.mockResolvedValue(mockProperty);
@@ -140,5 +145,44 @@ describe('BookingService', () => {
 
         await expect(bookingService.createBooking(bookingDTO)).rejects
             .toThrow('The property is unavailable in the date range requested');
+    });
+    it('should cancel an existing booking using a fake repository', async () => {
+        const mockProperty = {
+            getId: jest.fn().mockReturnValue('1'),
+            isAvailable: jest.fn().mockReturnValue(true),
+            validateGuestCount: jest.fn(),
+            calculateTotalPrice: jest.fn().mockReturnValue(500),
+            addBooking: jest.fn(),
+        } as any;
+
+        const mockUser = {
+            getId: jest.fn().mockReturnValue('1'),
+        } as any;
+
+        mockPropertyService.findPropertyById.mockResolvedValue(mockProperty);
+        mockUserService.findUserById.mockResolvedValue(mockUser);
+
+        const bookingDTO: CreateBookingDTO = {
+            propertyId: '1',
+            guestId: '1',
+            startDate: new Date('2024-12-20'),
+            endDate: new Date('2024-12-25'),
+            guestCount: 2,
+        };
+
+        const booking = await bookingService.createBooking(bookingDTO);
+
+        const spyFindById = jest.spyOn(fakeBookingRepository, 'findById');
+
+        await bookingService.cancelBooking(booking.getId());
+
+        const canceledBooking = await fakeBookingRepository.findById(
+            booking.getId()
+        );
+
+        expect(canceledBooking?.getStatus()).toBe('CANCELLED');
+        expect(spyFindById).toHaveBeenCalledWith(booking.getId());
+        expect(spyFindById).toHaveBeenCalledTimes(2);
+        spyFindById.mockRestore();
     });
 });
