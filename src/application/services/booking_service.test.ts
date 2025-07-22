@@ -30,14 +30,14 @@ describe('BookingService', () => {
             mockUserRepository
         ) as jest.Mocked<UserService>;
 
-        fakeBookingRepository = new FakeBookingRepository();
-
         mockDateRangeFactory = {
             create: jest.fn().mockReturnValue({
                 getStartDate: jest.fn().mockReturnValue(startDate),
                 getEndDate: jest.fn().mockReturnValue(endDate),
             }),
         } as jest.Mocked<DateRangeFactory>;
+        
+        fakeBookingRepository = new FakeBookingRepository();
 
         bookingService = new BookingService(
             fakeBookingRepository,
