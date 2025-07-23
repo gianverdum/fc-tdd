@@ -42,6 +42,10 @@ export class Booking {
         return this.property;
     }
 
+    getGuest(): User {
+        return this.guest;
+    }
+
     getUser(): User {
         return this.guest;
     }
