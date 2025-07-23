@@ -17,6 +17,7 @@ export class TypeORMPropertyRepository implements PropertyRepository {
     }
 
     async findById(id: string): Promise<Property | null> {
-        throw new Error("Method not implemented.");
+        const propertyEntity = await this.repository.findOne({ where: { id } });
+        return propertyEntity ? PropertyMapper.toDomain(propertyEntity) : null;
     }
 }

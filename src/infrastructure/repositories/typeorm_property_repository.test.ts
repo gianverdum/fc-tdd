@@ -25,7 +25,7 @@ describe('TypeORMPropertyRepository', () => {
         await dataSource.destroy();
     });
 
-    it('should create a property', async () => {
+    it('should save a property', async () => {
         const property = new Property(
             '1',
             'Casa na praia',
@@ -37,5 +37,23 @@ describe('TypeORMPropertyRepository', () => {
         const savedProperty = await repository.findOne({ where: { id: '1' } });
         expect(savedProperty).toBeDefined();
         expect(savedProperty?.id).toBe('1');
+    });
+    it('should find a property by id', async () => {
+        const property = new Property(
+            '2',
+            'Apartamento no centro',
+            'Um apartamento aconchegante no centro da cidade.',
+            4,
+            150
+        );
+        await propertyRepository.save(property);
+        const savedProperty = await propertyRepository.findById('2');
+        expect(savedProperty).not.toBeNull();
+        expect(savedProperty?.getId()).toBe('2');
+        expect(savedProperty?.getName()).toBe('Apartamento no centro');
+    });
+    it('should return null when property not found', async () => {
+        const property = await propertyRepository.findById('999');
+        expect(property).toBeNull();
     });
 });
