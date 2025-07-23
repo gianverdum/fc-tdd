@@ -2,6 +2,8 @@ import { DataSource, Repository } from "typeorm";
 import { Property } from "../../domain/entities/property";
 import { PropertyEntity } from "../persistence/entities/property_entity";
 import { TypeORMPropertyRepository } from "./typeorm_property_repository";
+import { BookingEntity } from "../persistence/entities/booking_entity";
+import { UserEntity } from "../persistence/entities/user_entity";
 describe('TypeORMPropertyRepository', () => {
     let dataSource: DataSource;
     let propertyRepository: TypeORMPropertyRepository;
@@ -14,7 +16,7 @@ describe('TypeORMPropertyRepository', () => {
             dropSchema: true,
             logging: false,
             synchronize: true,
-            entities: [PropertyEntity],
+            entities: [PropertyEntity, BookingEntity, UserEntity],
         });
         await dataSource.initialize();
         repository = dataSource.getRepository(PropertyEntity);

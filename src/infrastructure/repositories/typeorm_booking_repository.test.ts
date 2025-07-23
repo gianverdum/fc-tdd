@@ -5,6 +5,8 @@ import { User } from "../../domain/entities/user";
 import { DateRange } from "../../domain/value_objects/date_range";
 import { Property } from "../../domain/entities/property";
 import { Booking } from "../../domain/entities/booking";
+import { BookingEntity } from "../persistence/entities/booking_entity";
+import { TypeORMBookingRepository } from "./typeorm_booking_repository";
 describe('TypeORMBookingRepository', () => {
     let dataSource: DataSource;
     let bookingRepository: TypeORMBookingRepository;
