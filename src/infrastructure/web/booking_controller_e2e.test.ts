@@ -57,9 +57,9 @@ beforeAll(async () => {
         bookingController.createBooking(req, res).catch((err) => next(err));
     });
 
-    // app.post('/bookings/:id/cancel', (req, res, next) => {
-    //     bookingController.cancelBooking(req, res).catch((err) => next(err));
-    // });
+    app.post('/bookings/:id/cancel', (req, res, next) => {
+        bookingController.cancelBooking(req, res).catch((err) => next(err));
+    });
 });
 
 afterAll(async () => {
@@ -150,5 +150,28 @@ describe('BookingController', () => {
 
         expect(response.status).toBe(400);
         expect(response.body.error).toBe('Property not found');
+    });
+    it('should cancel a booking successfully', async () => {
+        const response = await request(app).post('/bookings').send({
+            propertyId: '1',
+            guestId: '1',
+            startDate: '2024-12-20',
+            endDate: '2024-12-25',
+            guestCount: 2,
+        });
+
+        const bookingId = response.body.booking.id;
+
+        const cancelResponse = await request(app)
+            .post(`/bookings/${bookingId}/cancel`);
+
+        expect(cancelResponse.status).toBe(200);
+        expect(cancelResponse.body.message).toBe('Booking canceled successfully');
+    });
+    it('should return 400 for canceling a non-existent booking', async () => {
+        const response = await request(app).post('/bookings/999/cancel');
+
+        expect(response.status).toBe(400);
+        expect(response.body.error).toBe('Booking not found');
     });
 });
