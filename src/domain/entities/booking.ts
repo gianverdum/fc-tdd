@@ -1,6 +1,3 @@
-import { FullRefund } from "../cancelation/full_refund";
-import { NoRefund } from "../cancelation/no_refund";
-import { PartialRefund } from "../cancelation/partial_refund";
 import { RefundRuleFactory } from "../cancelation/refund_rule_factory";
 import { DateRange } from "../value_objects/date_range";
 import { Property } from "./property";
@@ -82,7 +79,10 @@ export class Booking {
     }
 
     private validate(): void {
-        if (this.guestCount <= 0) {
+        if (!this.id) {
+            throw new Error('Booking ID is required');
+        }
+        if (!this.guestCount || this.guestCount <= 0) {
             throw new Error('The number of guests must be greater than zero');
         }
         this.property.validateGuestCount(this.guestCount);
