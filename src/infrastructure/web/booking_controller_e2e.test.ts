@@ -1,4 +1,5 @@
 import express from 'express';
+import request from 'supertest';
 import { DataSource } from 'typeorm';
 import { TypeORMBookingRepository } from '../repositories/typeorm_booking_repository';
 import { TypeORMPropertyRepository } from '../repositories/typeorm_property_repository';
@@ -56,9 +57,9 @@ beforeAll(async () => {
         bookingController.createBooking(req, res).catch((err) => next(err));
     });
 
-    app.post('/bookings/:id/cancel', (req, res, next) => {
-        bookingController.cancelBooking(req, res).catch((err) => next(err));
-    });
+    // app.post('/bookings/:id/cancel', (req, res, next) => {
+    //     bookingController.cancelBooking(req, res).catch((err) => next(err));
+    // });
 });
 
 afterAll(async () => {
@@ -87,5 +88,19 @@ describe('BookingController', () => {
             id: '1',
             name: 'User 1',
         });
+    });
+    it('should create a booking successfully', async () => {
+        const response = await request(app).post('/bookings').send({
+            propertyId: '1',
+            guestId: '1',
+            startDate: '2024-12-20',
+            endDate: '2024-12-25',
+            guestCount: 2,
+        });
+
+        expect(response.status).toBe(201);
+        expect(response.body.message).toBe('Booking created successfully');
+        expect(response.body.booking).toHaveProperty('id');
+        expect(response.body.booking).toHaveProperty('totalPrice');
     });
 });
