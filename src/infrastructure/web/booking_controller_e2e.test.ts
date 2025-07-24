@@ -103,4 +103,52 @@ describe('BookingController', () => {
         expect(response.body.booking).toHaveProperty('id');
         expect(response.body.booking).toHaveProperty('totalPrice');
     });
+    it('should return 400 for invalid start date format', async () => {
+        const response = await request(app).post('/bookings').send({
+            propertyId: '1',
+            guestId: '1',
+            startDate: 'invalid-date',
+            endDate: '2024-12-25',
+            guestCount: 2,
+        });
+
+        expect(response.status).toBe(400);
+        expect(response.body.error).toBe('Invalid start/end date format');
+    });
+    it('should return 400 for invalid end date format', async () => {
+        const response = await request(app).post('/bookings').send({
+            propertyId: '1',
+            guestId: '1',
+            startDate: '2024-12-20',
+            endDate: 'invalid-date',
+            guestCount: 2,
+        });
+
+        expect(response.status).toBe(400);
+        expect(response.body.error).toBe('Invalid start/end date format');
+    });
+    it('should return 400 for a guest number less than 1', async () => {
+        const response = await request(app).post('/bookings').send({
+            propertyId: '1',
+            guestId: '1',
+            startDate: '2024-12-20',
+            endDate: '2024-12-25',
+            guestCount: 0,
+        });
+
+        expect(response.status).toBe(400);
+        expect(response.body.error).toBe('The number of guests must be greater than zero');
+    });
+    it('should return 400 for an invalid propertyId', async () => {
+        const response = await request(app).post('/bookings').send({
+            propertyId: 'invalid-property-id',
+            guestId: '1',
+            startDate: '2024-12-20',
+            endDate: '2024-12-25',
+            guestCount: 2,
+        });
+
+        expect(response.status).toBe(400);
+        expect(response.body.error).toBe('Property not found');
+    });
 });
