@@ -4,6 +4,7 @@ import { Booking } from '../../../domain/entities/booking';
 import { Property } from '../../../domain/entities/property';
 import { DateRange } from '../../../domain/value_objects/date_range';
 import { User } from '../../../domain/entities/user';
+import { isClassElement } from 'typescript';
 describe('BookingMapper', () => {
     it('should map BookingEntity to Booking domain object', () => {
         const entity = new BookingEntity();
