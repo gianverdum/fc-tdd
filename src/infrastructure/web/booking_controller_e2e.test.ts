@@ -1,6 +1,8 @@
 import express from 'express';
 import request from 'supertest';
-import { DataSource } from 'typeorm';
+import { v4 as uuidv4 } from 'uuid';
+import { GenericContainer, StartedTestContainer } from 'testcontainers';
+import { DataSource, Not, IsNull } from 'typeorm';
 import { TypeORMBookingRepository } from '../repositories/typeorm_booking_repository';
 import { TypeORMPropertyRepository } from '../repositories/typeorm_property_repository';
 import { TypeORMUserRepository } from '../repositories/typeorm_user_repository';
@@ -32,11 +34,28 @@ let dataRange: DateRangeFactory;
 let propertyService: PropertyService;
 let userService: UserService;
 let bookingController: BookingController;
+let container: StartedTestContainer;
 
 beforeAll(async () => {
+    container = await new GenericContainer('postgres')
+        .withEnvironment({
+            POSTGRES_USER: 'test',
+            POSTGRES_PASSWORD: 'test',
+            POSTGRES_DB: 'test',
+        })
+        .withExposedPorts(5432)
+        .start();
+    
+    const port = container.getMappedPort(5432);
+    const host = container.getHost();
+
     dataSource = new DataSource({
-        type: 'sqlite',
-        database: ':memory:',
+        type: 'postgres',
+        host,
+        port,
+        username: 'test',
+        password: 'test',
+        database: 'test',
         synchronize: true,
         logging: false,
         entities: [BookingEntity, PropertyEntity, UserEntity],
@@ -67,10 +86,15 @@ beforeAll(async () => {
     app.post('/bookings/:id/cancel', (req, res, next) => {
         bookingController.cancelBooking(req, res).catch((err) => next(err));
     });
-});
+}, 20000);
 
 afterAll(async () => {
-    await dataSource.destroy();
+    if (dataSource?.isInitialized) {
+        await dataSource.destroy();
+    }
+    if (container) {
+        await container.stop();
+    }
 });
 
 describe('BookingController', () => {
@@ -84,12 +108,12 @@ describe('BookingController', () => {
         const userRepo = dataSource.getRepository(UserEntity);
         const bookingRepo = dataSource.getRepository(BookingEntity);
 
-        await bookingRepo.clear();
-        await propertyRepo.clear();
-        await userRepo.clear();
+        await dataSource.getRepository(BookingEntity).delete({ id: Not(IsNull()) });
+        await dataSource.getRepository(PropertyEntity).delete({ id: Not(IsNull()) });
+        await dataSource.getRepository(UserEntity).delete({ id: Not(IsNull()) });
 
-        const builtProperty = PropertyBuilder.aProperty().withId('1').withMaxGuests(6).build();
-        const builtUser = UserBuilder.aUser().withId('1').build();
+        const builtProperty = PropertyBuilder.aProperty().withId(uuidv4()).withMaxGuests(6).build();
+        const builtUser = UserBuilder.aUser().withId(uuidv4()).build();
 
         savedProperty = await propertyRepo.save({
             id: builtProperty.getId(),
@@ -163,9 +187,9 @@ describe('BookingController', () => {
         expect(response.status).toBe(400);
         expect(response.body.error).toBe('The number of guests must be greater than zero');
     });
-    it('should return 400 for an invalid propertyId', async () => {
+    it('should return 400 for a non-existent propertyId', async () => {
         const response = await request(app).post('/bookings').send({
-            propertyId: 'invalid-property-id',
+            propertyId: uuidv4(),
             guestId: guest.getId(),
             startDate: '2024-12-20',
             endDate: '2024-12-25',
@@ -199,7 +223,9 @@ describe('BookingController', () => {
         expect(cancelResponse.body.message).toBe('Booking canceled successfully');
     });
     it('should return 400 for canceling a non-existent booking', async () => {
-        const response = await request(app).post('/bookings/999/cancel');
+        const nonExistentBookingId = uuidv4();
+
+        const response = await request(app).post(`/bookings/${nonExistentBookingId}/cancel`);
 
         expect(response.status).toBe(400);
         expect(response.body.error).toBe('Booking not found');
