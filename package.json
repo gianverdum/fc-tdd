@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/gianverdum/fc-tdd#readme",
   "devDependencies": {
+    "@faker-js/faker": "^9.9.0",
     "@types/express": "^5.0.3",
     "@types/jest": "^30.0.0",
     "@types/node": "^24.1.0",
