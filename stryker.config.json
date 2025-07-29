@@ -1,0 +1,25 @@
+{
+  "$schema": "./node_modules/@stryker-mutator/core/schema/stryker-schema.json",
+  "packageManager": "npm",
+  "reporters": ["html", "clear-text", "progress"],
+  "testRunner": "jest",
+  "coverageAnalysis": "perTest",
+  "ignoreStatic": true,
+  "mutate": [
+    "src/**/*.ts",
+    "!src/**/*_e2e.test.ts",
+    "!src/database/**/*",
+    "!**/*.test.ts",
+    "!test/data-builders/**/*",
+    "!test/utils/**/*"
+  ],
+  "jest": {
+    "configFile": "jest.config.js",
+    "projectType": "custom",
+    "enableFindRelatedTests": false,
+    "config": {
+      "testMatch": ["**/?(*.)!(_e2e).test.ts"],
+      "testPathIgnorePatterns": ["/e2e/", "/test/e2e/"]
+    }
+  }
+}
