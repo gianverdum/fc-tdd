@@ -12,6 +12,8 @@ let container: TestDBContext['container'];
 let propertyRepository: TypeORMPropertyRepository;
 let repository: Repository<PropertyEntity>;
 
+jest.setTimeout(20000);
+
 beforeAll(async () => {
     const result = await createTestPostgresDataSource([
         BookingEntity,
@@ -24,7 +26,7 @@ beforeAll(async () => {
 
     repository = dataSource.getRepository(PropertyEntity);
     propertyRepository = new TypeORMPropertyRepository(repository);
-}, 20000);
+});
 
 afterAll(async () => {
     if (dataSource?.isInitialized) await dataSource.destroy();
