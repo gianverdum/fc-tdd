@@ -1,8 +1,8 @@
 import express from 'express';
 import request from 'supertest';
 import { v4 as uuidv4 } from 'uuid';
-import { GenericContainer, StartedTestContainer } from 'testcontainers';
 import { DataSource, Not, IsNull } from 'typeorm';
+import { createTestPostgresDataSource, TestDBContext } from '../../test/utils/create_test_datasource';
 import { TypeORMBookingRepository } from '../repositories/typeorm_booking_repository';
 import { TypeORMPropertyRepository } from '../repositories/typeorm_property_repository';
 import { TypeORMUserRepository } from '../repositories/typeorm_user_repository';
@@ -26,6 +26,7 @@ const app = express();
 app.use(express.json());
 
 let dataSource: DataSource;
+let container: TestDBContext['container'];
 let bookingRepository: TypeORMBookingRepository;
 let propertyRepository: TypeORMPropertyRepository;
 let userRepository: TypeORMUserRepository;
@@ -34,34 +35,18 @@ let dataRange: DateRangeFactory;
 let propertyService: PropertyService;
 let userService: UserService;
 let bookingController: BookingController;
-let container: StartedTestContainer;
+
+jest.setTimeout(20000);
 
 beforeAll(async () => {
-    container = await new GenericContainer('postgres')
-        .withEnvironment({
-            POSTGRES_USER: 'test',
-            POSTGRES_PASSWORD: 'test',
-            POSTGRES_DB: 'test',
-        })
-        .withExposedPorts(5432)
-        .start();
-    
-    const port = container.getMappedPort(5432);
-    const host = container.getHost();
+    const result = await createTestPostgresDataSource([
+        BookingEntity,
+        PropertyEntity,
+        UserEntity,
+    ]);
 
-    dataSource = new DataSource({
-        type: 'postgres',
-        host,
-        port,
-        username: 'test',
-        password: 'test',
-        database: 'test',
-        synchronize: true,
-        logging: false,
-        entities: [BookingEntity, PropertyEntity, UserEntity],
-    });
-
-    await dataSource.initialize();
+    dataSource = result.dataSource;
+    container = result.container;
 
     bookingRepository = new TypeORMBookingRepository(dataSource.getRepository(BookingEntity));
     propertyRepository = new TypeORMPropertyRepository(dataSource.getRepository(PropertyEntity));
@@ -86,15 +71,11 @@ beforeAll(async () => {
     app.post('/bookings/:id/cancel', (req, res, next) => {
         bookingController.cancelBooking(req, res).catch((err) => next(err));
     });
-}, 20000);
+});
 
 afterAll(async () => {
-    if (dataSource?.isInitialized) {
-        await dataSource.destroy();
-    }
-    if (container) {
-        await container.stop();
-    }
+    if (dataSource?.isInitialized) await dataSource.destroy();
+    if (container) await container.stop();
 });
 
 describe('BookingController', () => {

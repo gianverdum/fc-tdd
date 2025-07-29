@@ -1,6 +1,7 @@
 import express from 'express';
 import request from 'supertest';
 import { DataSource } from 'typeorm';
+import { createTestPostgresDataSource, TestDBContext } from '../../test/utils/create_test_datasource';
 import { UserService } from '../../application/services/user_service';
 import { TypeORMUserRepository } from '../repositories/typeorm_user_repository';
 import { UserEntity } from '../persistence/entities/user_entity';
@@ -10,20 +11,20 @@ const app = express();
 app.use(express.json());
 
 let dataSource: DataSource;
+let container: TestDBContext['container'];
 let userRepository: TypeORMUserRepository;
 let userService: UserService;
 let userController: UserController;
 
-beforeAll(async () => {
-    dataSource = new DataSource({
-        type: 'sqlite',
-        database: ':memory:',
-        synchronize: true,
-        logging: false,
-        entities: [UserEntity],
-    });
+jest.setTimeout(20000);
 
-    await dataSource.initialize();
+beforeAll(async () => {
+    const result = await createTestPostgresDataSource([
+        UserEntity,
+    ]);
+
+    dataSource = result.dataSource;
+    container = result.container;
 
     userRepository = new TypeORMUserRepository(dataSource.getRepository(UserEntity));
 
@@ -37,7 +38,8 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-    await dataSource.destroy();
+    if (dataSource?.isInitialized) await dataSource.destroy();
+    if (container) await container.stop();
 });
 
 describe('UserController', () => {

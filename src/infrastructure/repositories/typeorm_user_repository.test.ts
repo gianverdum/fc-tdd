@@ -1,50 +1,58 @@
+import { v4 as uuidv4 } from 'uuid';
 import { DataSource, Repository } from 'typeorm';
+import { createTestPostgresDataSource, TestDBContext } from '../../test/utils/create_test_datasource';
 import { User } from '../../domain/entities/user';
 import { UserEntity } from '../persistence/entities/user_entity';
 import { TypeORMUserRepository } from './typeorm_user_repository';
+
+let dataSource: DataSource;
+let container: TestDBContext['container'];
+let userRepository: TypeORMUserRepository;
+let repository: Repository<UserEntity>;
+
+jest.setTimeout(20000);
+
+beforeAll(async () => {
+    const result = await createTestPostgresDataSource([
+        UserEntity,
+    ]);
+
+    dataSource = result.dataSource;
+    container = result.container;
+
+    repository = dataSource.getRepository(UserEntity);
+    userRepository = new TypeORMUserRepository(repository);
+});
+
+afterAll(async () => {
+    if (dataSource?.isInitialized) await dataSource.destroy();
+    if (container) await container.stop();
+});
+
 describe('TypeORMUserRepository', () => {
-    let dataSource: DataSource;
-    let userRepository: TypeORMUserRepository;
-    let repository: Repository<UserEntity>;
-
-    beforeAll(async () => {
-        dataSource = new DataSource({
-            type: 'sqlite',
-            database: ':memory:',
-            dropSchema: true,
-            logging: false,
-            synchronize: true,
-            entities: [UserEntity],
-        });
-        await dataSource.initialize();
-        repository = dataSource.getRepository(UserEntity);
-        userRepository = new TypeORMUserRepository(repository);
-    });
-
-    afterAll(async () => {
-        await dataSource.destroy();
-    });
 
     it('should save a user', async () => {
-        const user = new User('1', 'John Doe',);
+        const fixeIdId = uuidv4();
+        const user = new User(fixeIdId, 'John Doe',);
         await userRepository.save(user);
 
-        const savedUser = await repository.findOne({ where: { id: '1' } });
+        const savedUser = await repository.findOne({ where: { id: fixeIdId } });
         expect(savedUser).not.toBeNull();
-        expect(savedUser?.id).toBe('1');
+        expect(savedUser?.id).toBe(fixeIdId);
         expect(savedUser?.name).toBe('John Doe');
     });
     it('should find a user by id', async () => {
-        const user = new User('2', 'Jane Doe');
+        const fixeIdId = uuidv4();
+        const user = new User(fixeIdId, 'Jane Doe');
         await userRepository.save(user);
 
-        const savedUser = await userRepository.findById('2');
+        const savedUser = await userRepository.findById(fixeIdId);
         expect(savedUser).not.toBeNull();
-        expect(savedUser?.getId()).toBe('2');
+        expect(savedUser?.getId()).toBe(fixeIdId);
         expect(savedUser?.getName()).toBe('Jane Doe');
     });
     it('should return null if user not found', async () => {
-        const user = await userRepository.findById('non-existing-id');
+        const user = await userRepository.findById(uuidv4());
         expect(user).toBeNull();
     });
 });
