@@ -3,7 +3,7 @@
 <html lang="en">
 
 <head>
-    <title>Code coverage report for infrastructure/repositories/typeorm_property_repository.ts</title>
+    <title>Code coverage report for database/migrations/1753801675226-Init.ts</title>
     <meta charset="utf-8" />
     <link rel="stylesheet" href="../../prettify.css" />
     <link rel="stylesheet" href="../../base.css" />
@@ -19,34 +19,34 @@
 <body>
 <div class='wrapper'>
     <div class='pad1'>
-        <h1><a href="../../index.html">All files</a> / <a href="index.html">infrastructure/repositories</a> typeorm_property_repository.ts</h1>
+        <h1><a href="../../index.html">All files</a> / <a href="index.html">database/migrations</a> 1753801675226-Init.ts</h1>
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">58.33% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>7/7</span>
+                <span class='fraction'>7/12</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>2/2</span>
+                <span class='fraction'>0/0</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">66.66% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>3/3</span>
+                <span class='fraction'>2/3</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">58.33% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>7/7</span>
+                <span class='fraction'>7/12</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line high'></div>
+    <div class='status-line medium'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -87,49 +87,49 @@
 <a name='L22'></a><a href='#L22'>22</a>
 <a name='L23'></a><a href='#L23'>23</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Repository } from "typeorm";
-import { Property } from "../../domain/entities/property";
-import { PropertyMapper } from "../persistence/mappers/property_mapper";
-import { PropertyEntity } from "../persistence/entities/property_entity";
-import { PropertyRepository } from "../../domain/repositories/property_repository";
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { MigrationInterface, QueryRunner } from "typeorm";
 &nbsp;
-export class TypeORMPropertyRepository implements PropertyRepository {
-    private readonly repository: Repository&lt;PropertyEntity&gt;;
+export class Init1753801675226 implements MigrationInterface {
+    name = 'Init1753801675226'
 &nbsp;
-    constructor(repository: Repository&lt;PropertyEntity&gt;) {
-        this.repository = repository;
+    public async up(queryRunner: QueryRunner): Promise&lt;void&gt; {
+        await queryRunner.query(`CREATE TABLE "properties" ("id" uuid NOT NULL, "name" character varying NOT NULL, "description" character varying NOT NULL, "max_guests" integer NOT NULL, "base_price_per_night" numeric NOT NULL, CONSTRAINT "PK_2d83bfa0b9fcd45dee1785af44d" PRIMARY KEY ("id"))`);
+        await queryRunner.query(`CREATE TABLE "users" ("id" uuid NOT NULL, "name" character varying NOT NULL, CONSTRAINT "PK_a3ffb1c0c8416b9fc6f907b7433" PRIMARY KEY ("id"))`);
+        await queryRunner.query(`CREATE TABLE "bookings" ("id" uuid NOT NULL, "start_date" TIMESTAMP NOT NULL, "end_date" TIMESTAMP NOT NULL, "guest_count" integer NOT NULL, "total_price" numeric NOT NULL, "status" character varying NOT NULL, "property_id" uuid NOT NULL, "guest_id" uuid NOT NULL, CONSTRAINT "PK_bee6805982cc1e248e94ce94957" PRIMARY KEY ("id"))`);
+        await queryRunner.query(`ALTER TABLE "bookings" ADD CONSTRAINT "FK_afa260d0e51f81520a480817702" FOREIGN KEY ("property_id") REFERENCES "properties"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "bookings" ADD CONSTRAINT "FK_b4403309538387262d97fdf2462" FOREIGN KEY ("guest_id") REFERENCES "users"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
     }
 &nbsp;
-    async save(property: Property): Promise&lt;void&gt; {
-        const propertyEntity = PropertyMapper.toPersistence(property);
-        await this.repository.save(propertyEntity);
+    public async <span class="fstat-no" title="function not covered" >down(</span>queryRunner: QueryRunner): Promise&lt;void&gt; {
+<span class="cstat-no" title="statement not covered" >        await queryRunner.query(`ALTER TABLE "bookings" DROP CONSTRAINT "FK_b4403309538387262d97fdf2462"`);</span>
+<span class="cstat-no" title="statement not covered" >        await queryRunner.query(`ALTER TABLE "bookings" DROP CONSTRAINT "FK_afa260d0e51f81520a480817702"`);</span>
+<span class="cstat-no" title="statement not covered" >        await queryRunner.query(`DROP TABLE "bookings"`);</span>
+<span class="cstat-no" title="statement not covered" >        await queryRunner.query(`DROP TABLE "users"`);</span>
+<span class="cstat-no" title="statement not covered" >        await queryRunner.query(`DROP TABLE "properties"`);</span>
     }
 &nbsp;
-    async findById(id: string): Promise&lt;Property | null&gt; {
-        const propertyEntity = await this.repository.findOne({ where: { id } });
-        return propertyEntity ? PropertyMapper.toDomain(propertyEntity) : null;
-    }
-}</pre></td></tr></table></pre>
+}
+&nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
             </div><!-- /wrapper -->
