@@ -1,6 +1,7 @@
 import express from 'express';
 import request from 'supertest';
 import { DataSource } from 'typeorm';
+import { createTestPostgresDataSource, TestDBContext } from '../../test/utils/create_test_datasource';
 import { PropertyService } from '../../application/services/property_service';
 import { TypeORMPropertyRepository } from '../repositories/typeorm_property_repository';
 import { PropertyEntity } from '../persistence/entities/property_entity';
@@ -12,20 +13,22 @@ const app = express();
 app.use(express.json());
 
 let dataSource: DataSource;
+let container: TestDBContext['container'];
 let propertyRepository: TypeORMPropertyRepository;
 let propertyService: PropertyService;
 let propertyController: PropertyController;
 
-beforeAll(async () => {
-    dataSource = new DataSource({
-        type: 'sqlite',
-        database: ':memory:',
-        synchronize: true,
-        logging: false,
-        entities: [PropertyEntity, BookingEntity, UserEntity],
-    });
+jest.setTimeout(20000);
 
-    await dataSource.initialize();
+beforeAll(async () => {
+    const result = await createTestPostgresDataSource([
+        BookingEntity,
+        PropertyEntity,
+        UserEntity,
+    ]);
+
+    dataSource = result.dataSource;
+    container = result.container;
 
     propertyRepository = new TypeORMPropertyRepository(dataSource.getRepository(PropertyEntity));
 
@@ -39,7 +42,8 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-    await dataSource.destroy();
+    if (dataSource?.isInitialized) await dataSource.destroy();
+    if (container) await container.stop();
 });
 
 describe('PropertyController', () => {

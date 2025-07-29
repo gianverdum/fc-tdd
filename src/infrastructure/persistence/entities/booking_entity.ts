@@ -17,10 +17,10 @@ export class BookingEntity {
     @JoinColumn({ name: 'guest_id' })
     guest!: UserEntity;
 
-    @Column({ type: 'datetime', name: 'start_date' })
+    @Column({ type: 'timestamp', name: 'start_date' })
     startDate!: Date;
 
-    @Column({ type: 'datetime', name: 'end_date' })
+    @Column({ type: 'timestamp', name: 'end_date' })
     endDate!: Date;
 
     @Column({ name: 'guest_count' })
