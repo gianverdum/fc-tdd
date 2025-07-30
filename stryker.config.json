@@ -8,9 +8,10 @@
   "mutate": [
     "src/**/*.ts",
     "!src/**/*.test.ts",
+    "!src/**/*.builder.ts",
+    "!src/**/*_test_datasource.ts",
     "!src/**/*_e2e.test.ts",
-    "!src/database/**/*",
-    "!test/**/*"
+    "!src/database/**/*"
   ],
   "jest": {
     "configFile": "jest.config.js",
