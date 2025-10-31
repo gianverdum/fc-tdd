@@ -1,5 +1,12 @@
 node_modules/
 dist/
 .env
+
+# Test coverage
+coverage/
+
+# Mutation testing reports
+reports/mutation/
+
 # stryker temp files
 .stryker-tmp
